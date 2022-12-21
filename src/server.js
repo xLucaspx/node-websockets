@@ -15,4 +15,4 @@ const servidorHttp = http.createServer(app);
 servidorHttp.listen(port, () => console.log(`Servidor rodando em http://localhost:${port}`));
 
 const io = new Server(servidorHttp);
-io.on('connection', (socket) => console.log(`Um cliente se conectou! Id: ${socket.id}`));
+export default io;
