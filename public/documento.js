@@ -1,23 +1,10 @@
-/* Uma vez que o front-end está sendo servido no mesmo domínio e porta
-que o servidor (http://localhost:3000), nós não precisamos passar nenhum
-parâmetro para io().; nesse caso, o Socket.IO deduz a URL do servidor pela
-URL do navegador. Mas se esse não fosse o caso, precisaríamos informar qual
-a URL do servidor. Por exemplo, se o cliente estivesse sendo servido em
-http://localhost:5000, e o servidor Socket.IO estivesse escutando em
-http://localhost:3000, precisaríamos escrever o seguinte código:
-
-const socket = io("http://localhost:3000"); 
-
-Sempre que a função io() é executada no front-end, um evento “connection” é
-emitido; assim, podemos escutá-lo do lado do servidor, obtendo as informações
-do cliente que se conectou. */
-const socket = io();
+import { emiteTextEdit } from "./socket-front-documento.js";
 
 const editorTexto = document.getElementById('editor-texto');
-editorTexto.addEventListener('keydown', () => {
-  socket.emit('text-edit', editorTexto.value);
-});
+editorTexto.addEventListener('keyup', () => emiteTextEdit(editorTexto.value));
 
-socket.on('text-edit-client', (texto) => {
+function atualizaEditorTexto(texto) {
   editorTexto.value = texto;
-});
+}
+
+export { atualizaEditorTexto }
