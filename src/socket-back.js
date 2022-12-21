@@ -4,13 +4,20 @@ import io from "./server.js";
 io.on('connection', (socket) => {
   console.log(`Um cliente se conectou! Id: ${socket.id}`)
 
-  socket.on('disconnect', (motivo) => console.log(`Cliente ${socket.id} desconectado; motivo: ${motivo}`));
+  // socket.on('disconnect', (motivo) => console.log(`Cliente ${socket.id} desconectado; motivo: ${motivo}`));
+
+  // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
+  socket.on('select-document', (nome) => socket.join(nome));
 
   // ouvindo o evento 'text-edit' para cada conexão:
-  socket.on('text-edit', (texto) => {
-    // socket.broadcast emite o evento para todos os clientes MENOS
-    // o que está conectado neste socket:
-    socket.broadcast.emit('text-edit', texto);
+  socket.on('text-edit', ({ texto, nomeDocumento }) => {
+    /* socket.broadcast emite o evento para todos os clientes MENOS
+    o que está conectado neste socket: */
+    // socket.broadcast.emit('text-edit', texto);
+
+    /* socket.to(nomeDaSala).emit emite o evento para todos os
+    clientes conectados na sala: */
+    socket.to(nomeDocumento).emit('text-edit', texto);
 
     /* o protocolo WebSockets permite que tanto o cliente quanto o servidor possam emitir eventos;
     quando um dos lados da comunicação emite um evento, apenas o outro lado pode escutá-lo, ou seja,

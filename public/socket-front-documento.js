@@ -15,14 +15,18 @@ emitido; assim, podemos escutá-lo do lado do servidor, obtendo as informações
 do cliente que se conectou. */
 const socket = io();
 
-socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
+// socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
 
-function emiteTextEdit(texto) {
-  socket.emit('text-edit', texto);
+function selecionaDocumento(nome) {
+  socket.emit('select-document', nome);
+}
+
+function emiteTextEdit(dados) {
+  socket.emit('text-edit', dados);
 }
 
 socket.on('text-edit', (texto) => {
   atualizaEditorTexto(texto);
 });
 
-export { emiteTextEdit }
+export { emiteTextEdit, selecionaDocumento }
