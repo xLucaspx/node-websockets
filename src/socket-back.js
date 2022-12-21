@@ -1,4 +1,4 @@
-import { atualizaDocumento, buscaDocumentos, encontraDocumento } from "./documentosDb.js";
+import { adicionaDocumento, atualizaDocumento, buscaDocumentos, encontraDocumento } from "./documentosDb.js";
 import io from "./server.js";
 
 // escutando o evento de conexão do cliente:
@@ -10,6 +10,19 @@ io.on('connection', (socket) => {
   socket.on('get-documents', async (devolveDocumentos) => {
     const documentos = await buscaDocumentos();
     devolveDocumentos(documentos);
+  });
+
+  socket.on('create-document', async (nomeDocumento) => {
+    const documentoExiste = (await encontraDocumento(nomeDocumento)) || null;
+
+    if (documentoExiste) {
+      socket.emit('duplicate-document', nomeDocumento);
+    } else {
+      const novoDocumento = await adicionaDocumento(nomeDocumento);
+      if (novoDocumento.acknowledged) {
+        io.emit('update-documents-list', nomeDocumento);
+      }
+    }
   });
 
   // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
@@ -31,7 +44,7 @@ io.on('connection', (socket) => {
   // ouvindo o evento 'text-edit' para cada conexão:
   socket.on('text-edit', async ({ texto, nomeDocumento }) => {
     const atualizacao = await atualizaDocumento(nomeDocumento, texto);
-    
+
     if (atualizacao.modifiedCount) {
       /* socket.to(nomeDaSala).emit emite o evento para todos os
       clientes conectados na sala: */
