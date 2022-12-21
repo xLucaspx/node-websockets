@@ -1,19 +1,5 @@
+import { atualizaDocumento, encontraDocumento } from "./documentosDb.js";
 import io from "./server.js";
-
-const documentos = [
-  {
-    nome: 'JavaScript',
-    texto: 'Texto de JavaScript'
-  },
-  {
-    nome: 'Node.js',
-    texto: 'Texto de Node.js'
-  },
-  {
-    nome: 'Vue.js',
-    texto: 'Texto de Vue.js'
-  },
-];
 
 // escutando o evento de conexão do cliente:
 io.on('connection', (socket) => {
@@ -22,10 +8,10 @@ io.on('connection', (socket) => {
   // socket.on('disconnect', (motivo) => console.log(`Cliente ${socket.id} desconectado; motivo: ${motivo}`));
 
   // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
-  socket.on('select-document', (nome, devolveTexto) => {
+  socket.on('select-document', async (nome, devolveTexto) => {
     socket.join(nome);
 
-    const documento = encontraDocumento(nome);
+    const documento = await encontraDocumento(nome);
     if (documento) {
       // socket.emit emite o evento para o cliente deste socket
       // socket.emit('document-text', documento.texto);
@@ -38,12 +24,10 @@ io.on('connection', (socket) => {
   });
 
   // ouvindo o evento 'text-edit' para cada conexão:
-  socket.on('text-edit', ({ texto, nomeDocumento }) => {
-    const documento = encontraDocumento(nomeDocumento);
-
-    if (documento) {
-      documento.texto = texto;
-
+  socket.on('text-edit', async ({ texto, nomeDocumento }) => {
+    const atualizacao = await atualizaDocumento(nomeDocumento, texto);
+    
+    if (atualizacao.modifiedCount) {
       /* socket.to(nomeDaSala).emit emite o evento para todos os
       clientes conectados na sala: */
       socket.to(nomeDocumento).emit('text-edit', texto);
@@ -60,9 +44,3 @@ io.on('connection', (socket) => {
     julgar que eles são intrínsecos, ou que um seja uma “continuação” do outro. */
   });
 });
-
-function encontraDocumento(nome) {
-  return documentos.find(documento => {
-    return documento.nome == nome;
-  });
-}
