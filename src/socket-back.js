@@ -1,4 +1,4 @@
-import { atualizaDocumento, encontraDocumento } from "./documentosDb.js";
+import { atualizaDocumento, buscaDocumentos, encontraDocumento } from "./documentosDb.js";
 import io from "./server.js";
 
 // escutando o evento de conexão do cliente:
@@ -6,6 +6,11 @@ io.on('connection', (socket) => {
   console.log(`Um cliente se conectou! Id: ${socket.id}`)
 
   // socket.on('disconnect', (motivo) => console.log(`Cliente ${socket.id} desconectado; motivo: ${motivo}`));
+
+  socket.on('get-documents', async (devolveDocumentos) => {
+    const documentos = await buscaDocumentos();
+    devolveDocumentos(documentos);
+  });
 
   // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
   socket.on('select-document', async (nome, devolveTexto) => {
