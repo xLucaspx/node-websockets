@@ -18,15 +18,15 @@ const socket = io();
 // socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
 
 function selecionaDocumento(nome) {
-  socket.emit('select-document', nome);
+  socket.emit('select-document', nome, (texto) => atualizaEditorTexto(texto));
 }
 
 function emiteTextEdit(dados) {
   socket.emit('text-edit', dados);
 }
 
-socket.on('text-edit', (texto) => {
-  atualizaEditorTexto(texto);
-});
+// socket.on('document-text', (texto) => atualizaEditorTexto(texto));
+
+socket.on('text-edit', (texto) => atualizaEditorTexto(texto));
 
 export { emiteTextEdit, selecionaDocumento }
