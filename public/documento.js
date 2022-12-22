@@ -1,4 +1,4 @@
-import { emiteTextEdit, selecionaDocumento } from "./socket-front-documento.js";
+import { emiteDeleteDocument, emiteTextEdit, selecionaDocumento } from "./socket-front-documento.js";
 
 const params = new URLSearchParams(window.location.search);
 const nomeDocumento = params.get('nome');
@@ -13,8 +13,20 @@ editorTexto.addEventListener('keyup', () => emiteTextEdit({
   nomeDocumento
 }));
 
+const btnExcluir = document.getElementById('excluir-documento');
+btnExcluir.addEventListener('click', () => {
+  emiteDeleteDocument(nomeDocumento);
+});
+
 function atualizaEditorTexto(texto) {
   editorTexto.value = texto;
 }
 
-export { atualizaEditorTexto }
+function alertaERedireciona(nome) {
+  if (nome == nomeDocumento) { // para redirecionar apenas quem está na página excluída
+    alert(`O documento ${nome} foi excluído com sucesso!`);
+    window.location.href = '/';
+  }
+}
+
+export { atualizaEditorTexto, alertaERedireciona }

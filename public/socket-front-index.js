@@ -1,4 +1,4 @@
-import { insereLinkDocumento } from "./index.js";
+import { insereLinkDocumento, removeLinkDocumento } from "./index.js";
 
 const socket = io();
 
@@ -11,6 +11,8 @@ socket.on('update-documents-list', (nomeDocumento) => {
 });
 
 socket.on('duplicate-document', (nomeDocumento) => alert(`O documento ${nomeDocumento} já existe!`));
+
+socket.on('delete-document', (nomeDocumento) => removeLinkDocumento(nomeDocumento));
 
 function emiteCreateDocument(nomeDocumento) {
   socket.emit('create-document', nomeDocumento);

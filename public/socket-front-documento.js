@@ -1,4 +1,4 @@
-import { atualizaEditorTexto } from "./documento.js";
+import { alertaERedireciona, atualizaEditorTexto } from "./documento.js";
 
 /* Uma vez que o front-end está sendo servido no mesmo domínio e porta
 que o servidor (http://localhost:3000), nós não precisamos passar nenhum
@@ -17,6 +17,7 @@ const socket = io();
 
 // socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
 
+// socket.on('document-text', (texto) => atualizaEditorTexto(texto));
 function selecionaDocumento(nome) {
   socket.emit('select-document', nome, (texto) => atualizaEditorTexto(texto));
 }
@@ -25,8 +26,12 @@ function emiteTextEdit(dados) {
   socket.emit('text-edit', dados);
 }
 
-// socket.on('document-text', (texto) => atualizaEditorTexto(texto));
+function emiteDeleteDocument(nome) {
+  socket.emit('delete-document', nome);
+}
 
 socket.on('text-edit', (texto) => atualizaEditorTexto(texto));
 
-export { emiteTextEdit, selecionaDocumento }
+socket.on('delete-document', (nome) => alertaERedireciona(nome));
+
+export { emiteTextEdit, emiteDeleteDocument, selecionaDocumento }
