@@ -4,7 +4,7 @@ import {
   buscaDocumentos,
   deletaDocumento,
   encontraDocumento,
-} from "./documentosDb.js";
+} from "./db/documentosDb.js";
 import io from "./server.js";
 
 // escutando o evento de conexão do cliente:
