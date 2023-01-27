@@ -1,3 +1,4 @@
+import "dotenv/config"; // para utilizar variáveis de ambiente no JWT
 import registraEventosCadastro from "./registraEventos/cadastro.js";
 import registraEventosDocumento from "./registraEventos/documento.js";
 import registraEventosInicio from "./registraEventos/inicio.js";

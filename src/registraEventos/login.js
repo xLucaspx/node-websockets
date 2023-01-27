@@ -1,5 +1,6 @@
 import { encontraUsuario } from "../db/usuariosDb.js";
 import autenticaUsuario from "../utils/autenticaUsuario.js";
+import geraJwt from "../utils/geraJwt.js";
 
 function registraEventosLogin(socket, io) {
   socket.on("user-login", async ({ user, password }) => {
@@ -9,7 +10,10 @@ function registraEventosLogin(socket, io) {
       const autenticado = autenticaUsuario(usuario, password);
 
       if (autenticado) {
-        socket.emit("login-success");
+        // para funcionar corretamente, o payload que irá gerar o token deve ser passado como um objeto:
+        const tokenJwt = geraJwt({ user });
+        socket.emit("login-success", tokenJwt);
+        
       } else {
         socket.emit("login-error");
       }
