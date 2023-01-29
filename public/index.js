@@ -1,4 +1,8 @@
 import { emiteCreateDocument } from "./socket-front-index.js";
+import { buscaCookie } from "./utils/cookies.js";
+
+const tokenJwt = buscaCookie("tokenJwt");
+console.log(tokenJwt);
 
 const listaDocumentos = document.getElementById("lista-documentos");
 const form = document.getElementById("form-adiciona-documento");
