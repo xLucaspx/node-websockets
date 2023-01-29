@@ -9,4 +9,8 @@ function buscaCookie(chave) {
     ?.split("=")[1];
 }
 
-export { defineCookie, buscaCookie };
+function removeCookie(chave) {
+  document.cookie = `${chave}=; expires=Thu, 01 Jan 1970 00:00:00`;
+}
+
+export { defineCookie, buscaCookie, removeCookie };
