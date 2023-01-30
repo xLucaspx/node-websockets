@@ -1,3 +1,4 @@
+import { buscaCookie } from "../utils/cookies.js";
 import { alertaERedireciona, atualizaEditorTexto } from "./documento.js";
 
 /* Uma vez que o front-end está sendo servido no mesmo domínio e porta
@@ -13,25 +14,30 @@ const socket = io("http://localhost:3000");
 Sempre que a função io() é executada no front-end, um evento “connection” é
 emitido; assim, podemos escutá-lo do lado do servidor, obtendo as informações
 do cliente que se conectou. */
-const socket = io();
+const socket = io("/usuarios", { auth: { token: buscaCookie("tokenJwt") } });
+
+socket.on("connect_error", (error) => {
+  alert(error.message);
+  window.location.href = "/login/index.html";
+});
 
 // socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
 
 // socket.on('document-text', (texto) => atualizaEditorTexto(texto));
 function selecionaDocumento(nome) {
-  socket.emit('select-document', nome, (texto) => atualizaEditorTexto(texto));
+  socket.emit("select-document", nome, (texto) => atualizaEditorTexto(texto));
 }
 
 function emiteTextEdit(dados) {
-  socket.emit('text-edit', dados);
+  socket.emit("text-edit", dados);
 }
 
 function emiteDeleteDocument(nome) {
-  socket.emit('delete-document', nome);
+  socket.emit("delete-document", nome);
 }
 
-socket.on('text-edit', (texto) => atualizaEditorTexto(texto));
+socket.on("text-edit", (texto) => atualizaEditorTexto(texto));
 
-socket.on('delete-document', (nome) => alertaERedireciona(nome));
+socket.on("delete-document", (nome) => alertaERedireciona(nome));
 
-export { emiteTextEdit, emiteDeleteDocument, selecionaDocumento }
+export { emiteTextEdit, emiteDeleteDocument, selecionaDocumento };
