@@ -9,11 +9,9 @@ function adicionaConexao(conexao) {
   conexoesDocumentos.push(conexao);
 }
 
-function removeConexao(nomeDocumento, nomeUsuario) {
+function removeConexao(idConexao) {
   const index = conexoesDocumentos.findIndex(
-    (conexao) =>
-      conexao.nomeDocumento == nomeDocumento &&
-      conexao.nomeUsuario == nomeUsuario
+    (conexao) => conexao.id == idConexao
   );
 
   if (index != -1) {

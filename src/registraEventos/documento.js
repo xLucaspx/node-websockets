@@ -21,7 +21,7 @@ function registraEventosDocumento(socket, io) {
           // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
           socket.join(nomeDocumento);
 
-          adicionaConexao({ nomeDocumento, nomeUsuario });
+          adicionaConexao({ nomeDocumento, nomeUsuario, id: socket.id });
           io.to(nomeDocumento).emit(
             "users-in-document",
             buscaUsuariosDocumento(nomeDocumento)
@@ -46,7 +46,7 @@ function registraEventosDocumento(socket, io) {
           específicos, ou seja, aqueles que já selecionaram esse documento (evento "select-document") */
           socket.on("disconnect", () => {
             if (socket.data.userInDocument) {
-              removeConexao(nomeDocumento, nomeUsuario);
+              removeConexao(socket.id);
 
               io.to(nomeDocumento).emit(
                 "users-in-document",
