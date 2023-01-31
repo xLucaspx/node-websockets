@@ -9,7 +9,18 @@ const nomeDocumento = params.get("nome");
 
 const tituloDocumento = document.getElementById("titulo-documento");
 tituloDocumento.textContent = nomeDocumento || "Documento sem título";
-selecionaDocumento(nomeDocumento);
+
+function trataSuccessfulAuthorization(payloadToken) {
+  selecionaDocumento({ nomeDocumento, nomeUsuario: payloadToken.user });
+}
+
+const listaUsuariosConectados = document.getElementById("usuarios-conectados");
+function atualizaInterfaceUsuarios(usuariosNoDucumento) {
+  listaUsuariosConectados.innerHTML = "";
+  usuariosNoDucumento.forEach((usuario) => {
+    listaUsuariosConectados.innerHTML += `<li class="list-group-item">${usuario}</li>`;
+  });
+}
 
 const editorTexto = document.getElementById("editor-texto");
 editorTexto.addEventListener("keyup", () =>
@@ -36,4 +47,9 @@ function alertaERedireciona(nome) {
   }
 }
 
-export { atualizaEditorTexto, alertaERedireciona };
+export {
+  atualizaEditorTexto,
+  alertaERedireciona,
+  trataSuccessfulAuthorization,
+  atualizaInterfaceUsuarios,
+};

@@ -11,7 +11,7 @@ import io from "./server.js";
 //   next(new Error("Você precisa fazer login para acessar essa página!"));
 // });
 
-// utilizando namespaces:
+// utilizando namespaces (sempre começa com '/'):
 const nspUsuarios = io.of("/usuarios");
 
 /* O que queremos fazer ao registrar um middleware é criar um intermediador

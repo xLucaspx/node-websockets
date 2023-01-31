@@ -1,5 +1,10 @@
 import { buscaCookie } from "../utils/cookies.js";
-import { alertaERedireciona, atualizaEditorTexto } from "./documento.js";
+import {
+  alertaERedireciona,
+  atualizaEditorTexto,
+  atualizaInterfaceUsuarios,
+  trataSuccessfulAuthorization,
+} from "./documento.js";
 
 /* Uma vez que o front-end está sendo servido no mesmo domínio e porta
 que o servidor (http://localhost:3000), nós não precisamos passar nenhum
@@ -24,8 +29,10 @@ socket.on("connect_error", (error) => {
 // socket.on('disconnect', (motivo) => console.log(`Servidor desconectado; motivo: ${motivo}`));
 
 // socket.on('document-text', (texto) => atualizaEditorTexto(texto));
-function selecionaDocumento(nome) {
-  socket.emit("select-document", nome, (texto) => atualizaEditorTexto(texto));
+function selecionaDocumento(dadosEntrada) {
+  socket.emit("select-document", dadosEntrada, (texto) =>
+    atualizaEditorTexto(texto)
+  );
 }
 
 function emiteTextEdit(dados) {
@@ -35,6 +42,17 @@ function emiteTextEdit(dados) {
 function emiteDeleteDocument(nome) {
   socket.emit("delete-document", nome);
 }
+
+socket.on("successful-authorization", trataSuccessfulAuthorization);
+
+socket.on("user-already-in-document", () => {
+  alert("Este documento já está aberto em outra página!");
+  window.location.href = "/";
+});
+
+socket.on("users-in-document", (usuarios) =>
+  atualizaInterfaceUsuarios(usuarios)
+);
 
 socket.on("text-edit", (texto) => atualizaEditorTexto(texto));
 

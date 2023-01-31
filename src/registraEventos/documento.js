@@ -3,23 +3,63 @@ import {
   deletaDocumento,
   encontraDocumento,
 } from "../db/documentosDb.js";
+import {
+  adicionaConexao,
+  buscaConexao,
+  buscaUsuariosDocumento,
+  removeConexao,
+} from "../utils/conexoesDocumentos.js";
 
 function registraEventosDocumento(socket, io) {
-  socket.on("select-document", async (nome, devolveTexto) => {
-    // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
-    socket.join(nome);
+  socket.on(
+    "select-document",
+    async ({ nomeDocumento, nomeUsuario }, devolveTexto) => {
+      const documento = await encontraDocumento(nomeDocumento);
+      if (documento) {
+        const conexaoEncontrada = buscaConexao(nomeDocumento, nomeUsuario);
+        if (!conexaoEncontrada) {
+          // socket.join agrupa clientes por "sala"; neste caso, cada documento é uma sala
+          socket.join(nomeDocumento);
 
-    const documento = await encontraDocumento(nome);
-    if (documento) {
-      // socket.emit emite o evento para o cliente deste socket
-      // socket.emit('document-text', documento.texto);
+          adicionaConexao({ nomeDocumento, nomeUsuario });
+          io.to(nomeDocumento).emit(
+            "users-in-document",
+            buscaUsuariosDocumento(nomeDocumento)
+          );
 
-      // forma mais sucinta: não é necessário emitir um novo evento,
-      // apenas chamar uma função callback no front (acknowledgements);
-      // é similar ao modelo requisição-resposta (http)
-      devolveTexto(documento.texto);
+          socket.data = {
+            userInDocument: true,
+          };
+
+          // socket.emit emite o evento para o cliente deste socket
+          // socket.emit('document-text', documento.texto);
+
+          // forma mais sucinta: não é necessário emitir um novo evento,
+          // apenas chamar uma função callback no front (acknowledgements);
+          // é similar ao modelo requisição-resposta (http)
+          devolveTexto(documento.texto);
+
+          /* No momento em que saímos de uma página ocorre uma desconexão daquele socket, já que um
+          socket só está presente em uma determinada página do HTML; no momento em que mudamos de página,
+          o socket é desconectado, ainda que estejamos logados, pois temos um socket em cada página.
+          Aqui estamos basicamente registrando esse ouvinte do evento de "disconnect" apenas para clientes
+          específicos, ou seja, aqueles que já selecionaram esse documento (evento "select-document") */
+          socket.on("disconnect", () => {
+            if (socket.data.userInDocument) {
+              removeConexao(nomeDocumento, nomeUsuario);
+
+              io.to(nomeDocumento).emit(
+                "users-in-document",
+                buscaUsuariosDocumento(nomeDocumento)
+              );
+            }
+          });
+        } else {
+          socket.emit("user-already-in-document");
+        }
+      }
     }
-  });
+  );
 
   // ouvindo o evento 'text-edit' para cada conexão:
   socket.on("text-edit", async ({ texto, nomeDocumento }) => {
